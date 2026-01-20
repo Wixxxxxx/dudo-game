@@ -1,0 +1,8 @@
+error: failed to load manifest for workspace member `/Users/waficchahine/src/liars-dice-native/liars-dice`
+referenced by workspace at `/Users/waficchahine/src/liars-dice-native/Cargo.toml`
+
+Caused by:
+  failed to read `/Users/waficchahine/src/liars-dice-native/liars-dice/Cargo.toml`
+
+Caused by:
+  No such file or directory (os error 2)

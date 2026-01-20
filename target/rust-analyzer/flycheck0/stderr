@@ -1,8 +1,0 @@
-   0.005107917s  INFO prepare_target{force=false package_id=liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native) target="liars_dice_native"}: cargo::core::compiler::fingerprint: fingerprint dirty for liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native)/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("liars_dice_native", ["lib"], "/Users/waficchahine/src/liars-dice-native/src/lib.rs", Edition2024) }
-   0.005118542s  INFO prepare_target{force=false package_id=liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native) target="liars_dice_native"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-   0.005414875s  INFO prepare_target{force=false package_id=liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native) target="liars_dice_native"}: cargo::core::compiler::fingerprint: fingerprint dirty for liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native)/Check { test: true }/TargetInner { name_inferred: true, ..: lib_target("liars_dice_native", ["lib"], "/Users/waficchahine/src/liars-dice-native/src/lib.rs", Edition2024) }
-   0.005417833s  INFO prepare_target{force=false package_id=liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native) target="liars_dice_native"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
-    Checking liars-dice-native v0.1.0 (/Users/waficchahine/src/liars-dice-native)
-error: could not compile `liars-dice-native` (lib test) due to 8 previous errors; 5 warnings emitted
-warning: build failed, waiting for other jobs to finish...
-error: could not compile `liars-dice-native` (lib) due to 7 previous errors; 4 warnings emitted
