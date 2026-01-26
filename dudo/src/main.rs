@@ -1,11 +1,14 @@
-use game_core::components::{Gamertag, Hand, Player};
-use game_core::systems::RollDiceSystem;
+use crate::components::bid::{Bid, BidEntry, BidHistory};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+// use game_core::systems::RollDiceSystem;
 use game_engine::{Entity, World};
 
 use anyhow::Result;
 use colored::Colorize;
 use inquire::{Select, Text};
 
+use dudo::{DudoEvent, event_systems::process_events, resources::GamePhase, setup_game};
 use rand::random_range;
 
 fn main() -> Result<()> {
@@ -19,35 +22,13 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-#[derive(Debug, Clone, Copy)]
-struct Bid {
-    pub quantity: u8,
-    pub face: u8,
-}
-
-struct BidEntry {
-    pub player: Entity,
-    pub bid: Bid,
-    pub round: u32,
-}
-
-struct BidHistory {
-    pub bids: Vec<(Entity, Bid)>,
-}
-
-enum PlayerAction {
-    InspectDice,
-    MakeBid(Bid),
-    CallBluff,
-}
-
 fn main_menu() -> Result<bool> {
     let menu = vec!["Start", "Rules", "Quit"];
     let menu_choice = Select::new("Main Menu", menu).prompt()?;
 
     match menu_choice {
         "Start" => {
-            play_game()?;
+            game_loop()?;
             Ok(true)
         }
         "Rules" => {
@@ -62,13 +43,19 @@ fn main_menu() -> Result<bool> {
     }
 }
 
-fn play_game() -> Result<()> {
-    let mut world = World::new();
-    let mut players = Vec::new();
-    add_players(&mut world, &mut players)?;
+fn game_loop() -> Result<()> {
+    let players = get_player_names()?;
+    let mut world = setup_game(players)?;
 
-    println!("\n{}", "🎲 Rolling dice...".bright_yellow());
-    RollDiceSystem::run(&mut world);
+    loop {
+        let phase = world.resource::<GameState>()?.phase;
+        if phase == GamePhase::RoundStart {
+            println!("\n{}", "🎲 Rolling dice...".bright_yellow());
+            emit(world, DudoEvent::RollDice)?;
+        }
+
+        process_events(&mut world);
+    }
 
     world.insert_resource(BidHistory { bids: Vec::new() })?;
     let starting_idx = random_range(0..players.len());
@@ -78,63 +65,63 @@ fn play_game() -> Result<()> {
         format!("🎯 {} starts!", starting_name.name).bright_green()
     );
 
-    game_loop(&mut world, &mut players, starting_idx)?;
+    // game_loop(&mut world, &mut players, starting_idx)?;
     Ok(())
 }
 
-fn game_loop(world: &mut World, players: &mut Vec<Entity>, starting_idx: usize) -> Result<()> {
-    let mut current_idx = starting_idx;
-    let mut current_bid: Option<Bid> = None;
+// fn game_loop(world: &mut World, players: &mut Vec<Entity>, starting_idx: usize) -> Result<()> {
+//     let mut current_idx = starting_idx;
+//     let mut current_bid: Option<Bid> = None;
 
-    loop {
-        let player = players[current_idx];
-        let gamertag = world.get_component::<Gamertag>(player)?;
+//     loop {
+//         let player = players[current_idx];
+//         let gamertag = world.get_component::<Gamertag>(player)?;
 
-        println!(
-            "\n{}",
-            format!("─── {}'s Turn ───", gamertag.name)
-                .bright_green()
-                .bold()
-        );
-        if let Some(bid) = &current_bid {
-            println!("Current bid: {} dice showing {}", bid.quantity, bid.face);
-        }
+//         println!(
+//             "\n{}",
+//             format!("─── {}'s Turn ───", gamertag.name)
+//                 .bright_green()
+//                 .bold()
+//         );
+//         if let Some(bid) = &current_bid {
+//             println!("Current bid: {} dice showing {}", bid.quantity, bid.face);
+//         }
 
-        let action = get_player_action(current_bid.is_some())?;
+//         let action = get_player_action(current_bid.is_some())?;
 
-        match action {
-            PlayerAction::InspectDice => {
-                println!("{}", world.get_component::<Hand>(player)?);
-                continue;
-            }
-            PlayerAction::MakeBid(bid) => {
-                if let Some(prev_bid) = &current_bid {
-                    if !is_higher_bid(&bid, prev_bid) {
-                        println!("{}", "Bid must be higher!".red());
-                        continue;
-                    }
-                }
-                current_bid = Some(bid);
-                println!(
-                    "{}",
-                    format!("✅ {} bids {} × {}", gamertag.name, bid.quantity, bid.face).green()
-                );
-            }
-            PlayerAction::CallBluff => {
-                if current_bid.is_none() {
-                    println!("{}", "No bid to challenge!".red());
-                    continue;
-                }
-                resolve_challenge(world, players, &current_bid.unwrap())?;
-                break;
-            }
-        }
+//         match action {
+//             PlayerAction::InspectDice => {
+//                 println!("{}", world.get_component::<Hand>(player)?);
+//                 continue;
+//             }
+//             PlayerAction::MakeBid(bid) => {
+//                 if let Some(prev_bid) = &current_bid {
+//                     if !is_higher_bid(&bid, prev_bid) {
+//                         println!("{}", "Bid must be higher!".red());
+//                         continue;
+//                     }
+//                 }
+//                 current_bid = Some(bid);
+//                 println!(
+//                     "{}",
+//                     format!("✅ {} bids {} × {}", gamertag.name, bid.quantity, bid.face).green()
+//                 );
+//             }
+//             PlayerAction::CallBluff => {
+//                 if current_bid.is_none() {
+//                     println!("{}", "No bid to challenge!".red());
+//                     continue;
+//                 }
+//                 resolve_challenge(world, players, &current_bid.unwrap())?;
+//                 break;
+//             }
+//         }
 
-        current_idx = (current_idx + 1) % players.len();
-    }
+//         current_idx = (current_idx + 1) % players.len();
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 fn get_player_action(has_bid: bool) -> Result<PlayerAction> {
     let actions = if has_bid {
@@ -259,6 +246,30 @@ fn add_players(world: &mut World, players: &mut Vec<Entity>) -> Result<()> {
     println!("\n{}", "✅ All players added!".bright_green());
 
     Ok(())
+}
+
+// This should be in main.rs (UI/input gathering)
+fn get_player_names() -> Result<Vec<String>> {
+    let player_count = Text::new("How many players (2-6)?")
+        .with_default("3")
+        .prompt()?
+        .parse::<usize>()?;
+
+    if !(2..7).contains(&player_count) {
+        println!("{}", "Must be 2-6 players!".red());
+        return get_player_names(); // Retry on invalid input
+    }
+
+    let mut names = Vec::new();
+    for i in 0..player_count {
+        let name = Text::new(&format!("Player {} name:", i + 1))
+            .with_default(&format!("Player {}", i + 1))
+            .prompt()?;
+        names.push(name);
+    }
+
+    println!("\n{}", "✅ All players added!".bright_green());
+    Ok(names)
 }
 
 fn show_title() {

@@ -1,12 +1,20 @@
 [package]
-name = "liars-dice"
+name = "dudo"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "dudo"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dudo"
+path = "src/main.rs"
+
 [dependencies]
 game-engine = { path = "../game-engine" }
-game-core = { path = "../game-core" }
 anyhow = "1.0.100"
 inquire = "0.9.1"
 colored = "3.0.0"
 rand = "0.9.2"
+serde = { version = "1.0", features = ["derive"] }
