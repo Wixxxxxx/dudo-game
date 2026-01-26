@@ -1,4 +1,16 @@
-use crate::{Component, Entity, World, WorldStorageError};
+use crate::{Component, World, WorldStorageError};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Eq, Hash, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct Entity {
+    pub id: u64,
+}
+
+impl Entity {
+    pub fn new(id: u64) -> Self {
+        Self { id }
+    }
+}
 
 pub struct EntityBuilder<'a> {
     world: &'a mut World,

@@ -97,6 +97,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "dudo"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "colored",
+ "game-engine",
+ "inquire",
+ "rand",
+ "serde",
+]
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -113,21 +125,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "five8_const"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26dec3da8bc3ef08f2c04f61eab298c3ab334523e55f076354d6d6f613799a7b"
-dependencies = [
- "five8_core",
-]
-
-[[package]]
-name = "five8_core"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2551bf44bc5f776c15044b9b94153a00198be06743e262afaaa61f11ac7523a5"
-
-[[package]]
 name = "fuzzy-matcher"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -137,17 +134,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "game-core"
-version = "0.1.0"
-dependencies = [
- "game-engine",
- "rand",
-]
-
-[[package]]
 name = "game-engine"
 version = "0.1.0"
 dependencies = [
+ "serde",
  "thiserror",
 ]
 
@@ -175,18 +165,6 @@ dependencies = [
  "fuzzy-matcher",
  "unicode-segmentation",
  "unicode-width",
-]
-
-[[package]]
-name = "liars-dice"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "colored",
- "game-core",
- "game-engine",
- "inquire",
- "rand",
 ]
 
 [[package]]
@@ -258,43 +236,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pinocchio"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c3410a5d525f024b0aed7f8747e94e918c91ba64274a190e2365903e2c0b2e9"
-
-[[package]]
-name = "pinocchio-pubkey"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb0225638cadcbebae8932cb7f49cb5da7c15c21beb19f048f05a5ca7d93f065"
-dependencies = [
- "five8_const",
- "pinocchio",
- "sha2-const-stable",
-]
-
-[[package]]
-name = "pinocchio-system"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "141ed5eafb4ab04568bb0e224e3dc9a9de13c933de4c004e0d1a553498be3a7c"
-dependencies = [
- "pinocchio",
- "pinocchio-pubkey",
-]
-
-[[package]]
-name = "pinocchio-token"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4eb3a10d04ea7a633c01c4fe68eb650b4606cee4a3977bd1a1259cba324abafb"
-dependencies = [
- "pinocchio",
- "pinocchio-pubkey",
-]
-
-[[package]]
 name = "ppv-lite86"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -310,15 +251,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5ee95bc4ef87b8d5ba32e8b7714ccc834865276eab0aed5c9958d00ec45f49e8"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "programs"
-version = "0.1.0"
-dependencies = [
- "pinocchio",
- "pinocchio-system",
- "pinocchio-token",
 ]
 
 [[package]]
@@ -409,10 +341,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d767eb0aabc880b29956c35734170f26ed551a859dbd361d140cdbeca61ab1e2"
 
 [[package]]
-name = "sha2-const-stable"
-version = "0.1.0"
+name = "serde"
+version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f179d4e11094a893b82fff208f74d448a7512f99f5a0acbd5c679b705f83ed9"
+checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
+dependencies = [
+ "serde_core",
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_core"
+version = "1.0.228"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.228"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "signal-hook"

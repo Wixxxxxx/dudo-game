@@ -9,3 +9,6 @@ pub use entity_builder::*;
 
 pub mod error;
 pub use error::*;
+
+pub mod event_queue;
+pub use event_queue::*;

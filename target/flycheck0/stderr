@@ -1,8 +1,18 @@
-error: failed to load manifest for workspace member `/Users/waficchahine/src/liars-dice-native/liars-dice`
-referenced by workspace at `/Users/waficchahine/src/liars-dice-native/Cargo.toml`
-
-Caused by:
-  failed to read `/Users/waficchahine/src/liars-dice-native/liars-dice/Cargo.toml`
-
-Caused by:
-  No such file or directory (os error 2)
+   0.100445500s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint: stale: changed "/Users/waficchahine/src/dudo-game/dudo/src/events.rs"
+   0.100586708s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:           (vs) "/Users/waficchahine/src/dudo-game/target/debug/.fingerprint/dudo-7e9daf0a94231f1b/dep-lib-dudo"
+   0.100589375s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1769401044, nanos: 346443604 } < FileTime { seconds: 1769404292, nanos: 930622563 }
+   0.100723583s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint: fingerprint dirty for dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo)/Check { test: false }/TargetInner { ..: lib_target("dudo", ["lib"], "/Users/waficchahine/src/dudo-game/dudo/src/lib.rs", Edition2024) }
+   0.100731208s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/Users/waficchahine/src/dudo-game/target/debug/.fingerprint/dudo-7e9daf0a94231f1b/dep-lib-dudo", reference_mtime: FileTime { seconds: 1769401044, nanos: 346443604 }, stale: "/Users/waficchahine/src/dudo-game/dudo/src/events.rs", stale_mtime: FileTime { seconds: 1769404292, nanos: 930622563 } }))
+   0.109528042s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint: stale: changed "/Users/waficchahine/src/dudo-game/dudo/src/systems/roll_dice.rs"
+   0.109534375s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:           (vs) "/Users/waficchahine/src/dudo-game/target/debug/.fingerprint/dudo-f7363cfd0b18c402/dep-test-lib-dudo"
+   0.109535625s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1769401044, nanos: 346457021 } < FileTime { seconds: 1769404008, nanos: 97904153 }
+   0.109649375s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint: fingerprint dirty for dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo)/Check { test: true }/TargetInner { ..: lib_target("dudo", ["lib"], "/Users/waficchahine/src/dudo-game/dudo/src/lib.rs", Edition2024) }
+   0.109654167s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/Users/waficchahine/src/dudo-game/target/debug/.fingerprint/dudo-f7363cfd0b18c402/dep-test-lib-dudo", reference_mtime: FileTime { seconds: 1769401044, nanos: 346457021 }, stale: "/Users/waficchahine/src/dudo-game/dudo/src/systems/roll_dice.rs", stale_mtime: FileTime { seconds: 1769404008, nanos: 97904153 } }))
+   0.110450792s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint: fingerprint dirty for dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo)/Check { test: false }/TargetInner { name: "dudo", doc: true, ..: with_path("/Users/waficchahine/src/dudo-game/dudo/src/main.rs", Edition2024) }
+   0.110456667s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+   0.110746875s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint: fingerprint dirty for dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo)/Check { test: true }/TargetInner { name: "dudo", doc: true, ..: with_path("/Users/waficchahine/src/dudo-game/dudo/src/main.rs", Edition2024) }
+   0.110749917s  INFO prepare_target{force=false package_id=dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo) target="dudo"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+    Checking dudo v0.1.0 (/Users/waficchahine/src/dudo-game/dudo)
+error: could not compile `dudo` (lib test) due to 1 previous error; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `dudo` (lib) due to 1 previous error; 1 warning emitted
