@@ -1,6 +1,7 @@
 use std::{
     any::{Any, TypeId, type_name},
     collections::{HashMap, HashSet},
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 use crate::{
@@ -216,6 +217,15 @@ impl World {
     ) -> Result<Option<Event<E>>, WorldResourceError> {
         let queue = self.resource_mut::<EventQueue<E>>()?;
         Ok(queue.pop())
+    }
+
+    pub fn emit_now<E: GameEvent + 'static>(&mut self, event: E) -> Result<(), WorldResourceError> {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs_f64();
+        self.emit_event(event, timestamp)?;
+        Ok(())
     }
 }
 

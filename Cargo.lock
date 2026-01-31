@@ -97,7 +97,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "dudo"
+name = "dudo-client"
+version = "0.1.0"
+dependencies = [
+ "dudo-core",
+ "game-engine",
+]
+
+[[package]]
+name = "dudo-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",

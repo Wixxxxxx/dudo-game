@@ -1,0 +1,12 @@
+[package]
+name = "dudo-client"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "dudo-client"
+path = "src/main.rs"
+
+[dependencies]
+dudo-core = { path = "../dudo-core" }
+game-engine = { path = "../game-engine" }
