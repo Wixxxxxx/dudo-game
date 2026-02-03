@@ -1,6 +1,6 @@
 use crate::components::dice::{Dice, Hand};
 use crate::components::player::Player;
-use crate::resources::{GamePhase, GameState};
+use crate::helpers::emit_current_turn_display;
 use anyhow::Result;
 use game_engine::World;
 use rand::random_range;
@@ -10,18 +10,14 @@ pub struct RollDiceSystem;
 impl RollDiceSystem {
     pub fn run(world: &mut World) -> Result<()> {
         let players_to_roll = world.query::<(Player, Hand)>();
-        let state = world.resource::<GameState>()?;
 
-        if state.phase == GamePhase::RoundStart {
-            for entity in players_to_roll {
-                if let Ok(hand) = world.component_mut::<Hand>(entity) {
-                    roll_hand(hand);
-                }
+        for entity in players_to_roll {
+            if let Ok(hand) = world.component_mut::<Hand>(entity) {
+                roll_hand(hand);
             }
         }
 
-        let state = world.resource_mut::<GameState>()?;
-        state.phase = GamePhase::Bidding;
+        emit_current_turn_display(world);
 
         Ok(())
     }

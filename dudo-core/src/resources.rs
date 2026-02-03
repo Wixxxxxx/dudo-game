@@ -1,32 +1,30 @@
-use crate::bid::Bid;
+use crate::components::bid::Bid;
 use game_engine::Entity;
-use serde::{Deserialize, Serialize};
 
 // ============================================================================
 // Game State
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum GamePhase {
-    RoundStart,
-    Bidding,
-    Challenge,
-    RoundEnd,
+    InPlay,
     GameOver,
 }
 
 pub struct GameState {
     pub round: u32,
-    pub current_bid: Option<Bid>,
     pub phase: GamePhase,
+    pub current_bid: Option<Bid>,
+    pub winner: Option<Entity>,
 }
 
 impl GameState {
     pub fn new() -> Self {
         Self {
             round: 1,
+            phase: GamePhase::InPlay,
             current_bid: None,
-            phase: GamePhase::Bidding,
+            winner: None,
         }
     }
 }

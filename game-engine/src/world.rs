@@ -202,7 +202,7 @@ impl World {
             .ok_or_else(|| WorldResourceError::ResourceTypeMismatch(type_name::<T>()))
     }
 
-    pub fn emit_event<E: GameEvent + 'static>(
+    fn _emit_event<E: GameEvent + 'static>(
         &mut self,
         event: E,
         timestamp: f64,
@@ -224,7 +224,7 @@ impl World {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs_f64();
-        self.emit_event(event, timestamp)?;
+        self._emit_event(event, timestamp)?;
         Ok(())
     }
 }

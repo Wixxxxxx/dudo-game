@@ -1,9 +1,9 @@
 pub mod components;
 pub mod events;
+pub mod helpers;
 pub mod resources;
 pub mod systems;
 
-pub use components::*;
 pub use events::DudoEvent;
 use rand::rng;
 use rand::seq::SliceRandom;
@@ -13,9 +13,11 @@ use anyhow::Result;
 use game_engine::{Entity, EventQueue, World};
 
 use crate::components::dice::Hand;
-use crate::components::event_systems::process_events;
 use crate::components::player::{Gamertag, Player};
-use crate::resources::{BidHistory, GamePhase, GameState, TurnOrder};
+use crate::events::ClientEvent;
+use crate::resources::GamePhase;
+use crate::resources::{BidHistory, GameState, TurnOrder};
+use crate::systems::event_systems::process_events;
 
 pub struct GameLoop {
     world: World,
@@ -27,16 +29,17 @@ impl GameLoop {
         Ok(Self { world })
     }
 
-    pub fn tick(&mut self) -> Result<bool> {
-        // handle game over
-        let phase = self.world.resource::<GameState>()?.phase;
-        if phase == GamePhase::RoundStart {
-            self.world.emit_now(DudoEvent::GameReady)?;
-        }
-
+    pub fn tick(&mut self) -> Result<()> {
         process_events(&mut self.world)?;
+        Ok(())
+    }
 
-        Ok(true)
+    pub fn is_game_over(&self) -> Result<bool> {
+        Ok(self.world.resource::<GameState>()?.phase == GamePhase::GameOver)
+    }
+
+    pub fn can_challenge(&self) -> Result<bool> {
+        Ok(!self.world.resource::<BidHistory>()?.bids.is_empty())
     }
 
     pub fn submit_action(&mut self, action: PlayerAction) -> Result<()> {
@@ -69,12 +72,13 @@ pub enum PlayerAction {
 pub fn setup_game(player_names: Vec<String>) -> Result<World> {
     let mut world = World::new();
     world.insert_resource(EventQueue::<DudoEvent>::new());
-    world.insert_resource(EventQueue::<DudoEvent>::new());
+    world.insert_resource(EventQueue::<ClientEvent>::new());
     world.insert_resource(GameState::new());
     world.insert_resource(BidHistory::new());
 
     let players = add_players(&mut world, player_names)?;
     world.insert_resource(TurnOrder::new(players));
+    world.emit_now(DudoEvent::RollDice)?;
     Ok(world)
 }
 
