@@ -1,5 +1,8 @@
 use crate::components::bid::Bid;
 use game_engine::Entity;
+use rand::rng;
+use rand::seq::SliceRandom;
+use std::fmt;
 
 // ============================================================================
 // Game State
@@ -67,6 +70,11 @@ impl TurnOrder {
     pub fn player_count(&self) -> usize {
         self.players.len()
     }
+
+    pub fn shuffle(&mut self) {
+        self.players.shuffle(&mut rng());
+        self.current_index = 0;
+    }
 }
 
 // ============================================================================
@@ -92,5 +100,30 @@ impl BidHistory {
 
     pub fn add_bid(&mut self, new_bid: Bid) {
         self.bids.push(new_bid);
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.bids.is_empty()
+    }
+}
+
+impl fmt::Display for BidHistory {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.bids.is_empty() {
+            return write!(f, "No bids yet");
+        }
+
+        writeln!(f, "Bid History:")?;
+        for (i, bid) in self.bids.iter().enumerate() {
+            writeln!(
+                f,
+                "  {}. {}: {} × {}",
+                i + 1,
+                bid.player_name,
+                bid.quantity,
+                bid.face
+            )?;
+        }
+        Ok(())
     }
 }
