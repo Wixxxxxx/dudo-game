@@ -17,7 +17,7 @@ use crate::components::player::{Gamertag, Player};
 use crate::events::ClientEvent;
 use crate::resources::GamePhase;
 use crate::resources::{BidHistory, GameState, TurnOrder};
-use crate::systems::event_systems::{process_client_events, process_events};
+use crate::systems::event_systems::process_events;
 
 pub struct GameLoop {
     world: World,
@@ -29,9 +29,9 @@ impl GameLoop {
         Ok(Self { world })
     }
 
-    pub fn tick(&mut self) -> Result<Vec<ClientEvent>> {
+    pub fn tick(&mut self) -> Result<()> {
         process_events(&mut self.world)?;
-        process_client_events(&mut self.world)
+        Ok(())
     }
 
     pub fn is_game_over(&self) -> Result<bool> {
@@ -45,46 +45,22 @@ impl GameLoop {
     pub fn submit_action(&mut self, action: PlayerAction) -> Result<()> {
         match action {
             PlayerAction::Bid { quantity, face } => {
-                let player = self.get_current_player()?;
-                let player_name = self.world.component::<Gamertag>(player)?.name.clone();
+                let turn_order = self.world.resource::<TurnOrder>()?;
+                let player = turn_order.current_player();
                 self.world.emit_now(DudoEvent::BidMade {
                     player,
-                    player_name,
                     quantity,
                     face,
                 })?;
             }
             PlayerAction::Challenge => {
-                let challenger = self.get_current_player()?;
+                let turn_order = self.world.resource::<TurnOrder>()?;
+                let challenger = turn_order.current_player();
                 self.world
                     .emit_now(DudoEvent::ChallengeMade { challenger })?;
             }
         }
         Ok(())
-    }
-
-    pub fn get_current_player(&mut self) -> Result<Entity> {
-        let turn_order = self.world.resource::<TurnOrder>()?;
-        Ok(turn_order.current_player())
-    }
-
-    pub fn get_current_player_hand(&mut self) -> Result<&Hand> {
-        let player = self.get_current_player()?;
-        let hand = self.world.component::<Hand>(player)?;
-        Ok(hand)
-    }
-
-    pub fn get_current_bid(&self) -> Result<Option<(u8, u8)>> {
-        let game_state = self.world.resource::<GameState>()?;
-        Ok(game_state
-            .current_bid
-            .as_ref()
-            .map(|bid| (bid.quantity, bid.face)))
-    }
-
-    pub fn get_bid_history(&self) -> Result<String> {
-        let bid_history = self.world.resource::<BidHistory>()?;
-        Ok(format!("{}", bid_history))
     }
 }
 

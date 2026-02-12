@@ -1,20 +1,18 @@
-use crate::events::{ClientEvent, DudoEvent};
+use crate::events::DudoEvent;
 use crate::systems::challenge::ResolveChallengeSystem;
 use crate::systems::place_bid::PlaceBidSystem;
 use crate::systems::roll_dice::RollDiceSystem;
-use anyhow::Result;
-use game_engine::{EventQueue, World};
+use game_engine::World;
 
-pub fn process_events(world: &mut World) -> Result<()> {
+pub fn process_events(world: &mut World) -> anyhow::Result<()> {
     while let Some(event) = world.pop_event::<DudoEvent>()?.map(|e| e.event) {
         match event {
             DudoEvent::BidMade {
                 player,
-                player_name,
                 quantity,
                 face,
             } => {
-                PlaceBidSystem::run(world, player, player_name, quantity, face)?;
+                PlaceBidSystem::run(world, player, quantity, face)?;
             }
             DudoEvent::RollDice => {
                 RollDiceSystem::run(world)?;
@@ -25,9 +23,4 @@ pub fn process_events(world: &mut World) -> Result<()> {
         }
     }
     Ok(())
-}
-
-pub fn process_client_events(world: &mut World) -> Result<Vec<ClientEvent>> {
-    let queue = world.resource_mut::<EventQueue<ClientEvent>>()?;
-    Ok(queue.drain().into_iter().map(|e| e.event).collect())
 }

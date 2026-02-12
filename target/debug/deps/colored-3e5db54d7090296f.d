@@ -1,0 +1,10 @@
+/Users/waficchahine/src/liars-dice-native/target/debug/deps/libcolored-3e5db54d7090296f.rmeta: /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/lib.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/color.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/control.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/error.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/style.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/customcolors.rs
+
+/Users/waficchahine/src/liars-dice-native/target/debug/deps/colored-3e5db54d7090296f.d: /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/lib.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/color.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/control.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/error.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/style.rs /Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/customcolors.rs
+
+/Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/lib.rs:
+/Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/color.rs:
+/Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/control.rs:
+/Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/error.rs:
+/Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/style.rs:
+/Users/waficchahine/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-3.0.0/src/customcolors.rs:

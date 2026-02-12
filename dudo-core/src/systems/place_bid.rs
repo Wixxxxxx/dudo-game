@@ -3,6 +3,7 @@ use game_engine::{Entity, World};
 
 use crate::{
     components::bid::Bid,
+    events::ClientEvent,
     resources::{BidHistory, GameState, TurnOrder},
 };
 
@@ -11,17 +12,11 @@ use crate::helpers::emit_current_turn_display;
 pub struct PlaceBidSystem;
 
 impl PlaceBidSystem {
-    pub fn run(
-        world: &mut World,
-        player: Entity,
-        player_name: String,
-        quantity: u8,
-        face: u8,
-    ) -> Result<()> {
+    pub fn run(world: &mut World, player: Entity, quantity: u8, face: u8) -> Result<()> {
+        // add new bid to history
+        let new_bid = Bid::new(player, quantity, face);
         let game_state = world.resource_mut::<GameState>()?;
-        let new_bid = Bid::new(player, player_name, quantity, face);
-
-        game_state.current_bid = Some(new_bid.clone());
+        game_state.current_bid = Some(new_bid);
         let bid_history = world.resource_mut::<BidHistory>()?;
         bid_history.add_bid(new_bid);
 
@@ -30,6 +25,7 @@ impl PlaceBidSystem {
         turn_order.advance();
 
         emit_current_turn_display(world)?;
+        world.emit_now(ClientEvent::DisplayActions)?;
         Ok(())
     }
 }

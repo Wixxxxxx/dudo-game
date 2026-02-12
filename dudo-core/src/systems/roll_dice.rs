@@ -17,7 +17,7 @@ impl RollDiceSystem {
             }
         }
 
-        emit_current_turn_display(world)?;
+        emit_current_turn_display(world);
 
         Ok(())
     }

@@ -8,7 +8,6 @@ impl GameEvent for ClientEvent {}
 pub enum DudoEvent {
     BidMade {
         player: Entity,
-        player_name: String,
         quantity: u8,
         face: u8,
     },
@@ -37,6 +36,7 @@ pub enum ClientEvent {
     DisplayGameOver {
         winner_name: String,
     },
+    DisplayActions,
     DisplayPlayerEliminated {
         player_name: String,
     },
