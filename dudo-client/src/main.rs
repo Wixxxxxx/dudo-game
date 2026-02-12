@@ -2,7 +2,7 @@ use anyhow::Result;
 use colored::Colorize;
 use inquire::{Select, Text};
 
-use dudo_core::GameLoop;
+use dudo_core::{events::ClientEvent, GameLoop, PlayerAction};
 
 fn main() -> Result<()> {
     loop {
@@ -15,15 +15,74 @@ fn main() -> Result<()> {
         let mut game = GameLoop::new(player_names)?;
 
         loop {
-            game.tick()?;
+            // process game logic
+            let ui_events = game.tick()?;
+
+            for event in ui_events {
+                display_event(event);
+            }
 
             if game.is_game_over()? {
                 break;
             }
+
+            let can_challenge = game.can_challenge()?;
+            let action = get_player_action(&mut game, can_challenge)?;
+            game.submit_action(action)?;
         }
     }
 
     Ok(())
+}
+
+fn display_event(event: ClientEvent) {
+    match event {
+        ClientEvent::DisplayCurrentTurn { player_name } => {
+            println!(
+                "\n{}",
+                format!("─── {}'s Turn ───", player_name)
+                    .bright_green()
+                    .bold()
+            );
+        }
+        ClientEvent::DisplayGameOver { winner_name } => {
+            println!(
+                "\n{}",
+                format!("🏆 {} WINS! 🏆", winner_name)
+                    .bright_yellow()
+                    .bold()
+            );
+        }
+        ClientEvent::DisplayPlayerEliminated { player_name } => {
+            println!(
+                "\n{}",
+                format!("❌ {} has been eliminated!", player_name).red()
+            );
+        }
+        ClientEvent::DisplayChallengeLoser { loser } => {
+            println!("\n{}", format!("Challenge lost by {}!", loser).red());
+        }
+        ClientEvent::DisplayChallenge { challenger_name } => {
+            println!(
+                "\n{}, by {}",
+                "⚔️ CHALLENGE!".bright_red().bold(),
+                challenger_name
+            );
+        }
+        ClientEvent::DisplayBid {
+            player_name,
+            quantity,
+            face,
+        } => {
+            println!(
+                "\n{}, player: {}, quantity: {}, face: {}",
+                "BID PLACED".bright_green().bold(),
+                player_name,
+                quantity,
+                face
+            )
+        }
+    }
 }
 
 fn main_menu() -> Result<bool> {
@@ -34,7 +93,7 @@ fn main_menu() -> Result<bool> {
         "Start" => Ok(true),
         "Rules" => {
             show_rules()?;
-            Ok(true)
+            main_menu()
         }
         "Quit" => {
             quit()?;
@@ -44,184 +103,83 @@ fn main_menu() -> Result<bool> {
     }
 }
 
-// fn game_loop(world: &mut World, players: &mut Vec<Entity>, starting_idx: usize) -> Result<()> {
-//     let mut current_idx = starting_idx;
-//     let mut current_bid: Option<Bid> = None;
+fn get_player_action(game: &mut GameLoop, can_challenge: bool) -> Result<PlayerAction> {
+    let actions = if can_challenge {
+        vec![
+            "Inspect Dice",
+            "View Bid History",
+            "Raise Bid",
+            "Call Bluff",
+        ]
+    } else {
+        vec!["Inspect Dice", "View Bid History", "Make First Bid"]
+    };
 
-//     loop {
-//         let player = players[current_idx];
-//         let gamertag = world.get_component::<Gamertag>(player)?;
+    let choice = Select::new("Choose action:", actions).prompt()?;
 
-//         println!(
-//             "\n{}",
-//             format!("─── {}'s Turn ───", gamertag.name)
-//                 .bright_green()
-//                 .bold()
-//         );
-//         if let Some(bid) = &current_bid {
-//             println!("Current bid: {} dice showing {}", bid.quantity, bid.face);
-//         }
+    match choice {
+        "Inspect Dice" => {
+            // display current player's hand
+            let hand = game.get_current_player_hand()?;
+            println!("{}", hand);
+            get_player_action(game, can_challenge)
+        }
+        "View Bid History" => {
+            let history = game.get_bid_history()?;
+            println!("\n{}", history.yellow());
+            get_player_action(game, can_challenge)
+        }
+        "Raise Bid" | "Make First Bid" => {
+            let current_bid = game.get_current_bid()?;
+            let (quantity, face) = get_bid_from_player(current_bid)?;
+            Ok(PlayerAction::Bid { quantity, face })
+        }
+        "Call Bluff" => Ok(PlayerAction::Challenge),
+        _ => get_player_action(game, can_challenge),
+    }
+}
 
-//         let action = get_player_action(current_bid.is_some())?;
+fn get_bid_from_player(current_bid: Option<(u8, u8)>) -> Result<(u8, u8)> {
+    let quantity = Text::new("How many dice?").prompt()?.parse::<u8>()?;
 
-//         match action {
-//             PlayerAction::InspectDice => {
-//                 println!("{}", world.get_component::<Hand>(player)?);
-//                 continue;
-//             }
-//             PlayerAction::MakeBid(bid) => {
-//                 if let Some(prev_bid) = &current_bid {
-//                     if !is_higher_bid(&bid, prev_bid) {
-//                         println!("{}", "Bid must be higher!".red());
-//                         continue;
-//                     }
-//                 }
-//                 current_bid = Some(bid);
-//                 println!(
-//                     "{}",
-//                     format!("✅ {} bids {} × {}", gamertag.name, bid.quantity, bid.face).green()
-//                 );
-//             }
-//             PlayerAction::CallBluff => {
-//                 if current_bid.is_none() {
-//                     println!("{}", "No bid to challenge!".red());
-//                     continue;
-//                 }
-//                 resolve_challenge(world, players, &current_bid.unwrap())?;
-//                 break;
-//             }
-//         }
+    let face = Text::new("What face value (1-6)?")
+        .prompt()?
+        .parse::<u8>()?;
 
-//         current_idx = (current_idx + 1) % players.len();
-//     }
+    // validate face value
+    if !(1..=6).contains(&face) {
+        println!("{}", "Face must be 1-6!".red());
+        return get_bid_from_player(current_bid);
+    }
 
-//     Ok(())
-// }
+    // validate new bid is higher than current bid
+    if let Some((curr_quantity, curr_face)) = current_bid {
+        if !is_higher_bid(quantity, face, curr_quantity, curr_face) {
+            println!(
+                "{}",
+                format!(
+                    "Bid must be higher than {} × {}! Try again.",
+                    curr_quantity, curr_face
+                )
+                .red()
+            );
+            return get_bid_from_player(current_bid);
+        }
+    }
+    Ok((quantity, face))
+}
 
-// fn get_player_action(has_bid: bool) -> Result<PlayerAction> {
-//     let actions = if has_bid {
-//         vec!["Inspect Dice", "Raise Bid", "Call Bluff"]
-//     } else {
-//         vec!["Inspect Dice", "Make First Bid"]
-//     };
+fn is_higher_bid(new_quantity: u8, new_face: u8, curr_quantity: u8, curr_face: u8) -> bool {
+    if new_quantity > curr_quantity && new_face == curr_face {
+        return true;
+    }
 
-//     let choice = Select::new("Choose action:", actions).prompt()?;
+    if new_face > curr_face && new_quantity == curr_quantity {
+        return true;
+    }
 
-//     match choice {
-//         "Inspect Dice" => Ok(PlayerAction::InspectDice),
-//         "Raise Bid" | "Make First Bid" => {
-//             let bid = get_bid_from_player()?;
-//             Ok(PlayerAction::MakeBid(bid))
-//         }
-//         "Call Bluff" => Ok(PlayerAction::CallBluff),
-//         _ => Ok(PlayerAction::InspectDice),
-//     }
-// }
-
-// fn get_bid_from_player() -> Result<Bid> {
-//     let quantity = Text::new("How many dice?").prompt()?.parse::<u8>()?;
-
-//     let face = Text::new("What face value (1-6)?")
-//         .prompt()?
-//         .parse::<u8>()?;
-
-//     if face < 1 || face > 6 {
-//         println!("{}", "Face must be 1-6!".red());
-//         return get_bid_from_player();
-//     }
-
-//     Ok(Bid { quantity, face })
-// }
-
-// fn is_higher_bid(new_bid: &Bid, prev_bid: &Bid) -> bool {
-//     if new_bid.quantity > prev_bid.quantity {
-//         return true;
-//     }
-//     if new_bid.quantity == prev_bid.quantity && new_bid.face > prev_bid.face {
-//         return true;
-//     }
-//     false
-// }
-
-// fn resolve_challenge(world: &World, players: &[Entity], bid: &Bid) -> Result<()> {
-//     println!(
-//         "\n{}",
-//         "⚔️  CHALLENGE! Revealing all dice...".bright_red().bold()
-//     );
-
-//     let mut total_count = 0;
-
-//     for &player in players {
-//         let gamertag = world.get_component::<Gamertag>(player)?;
-//         let hand = world.get_component::<Hand>(player)?;
-
-//         let count = hand
-//             .dice
-//             .iter()
-//             .filter(|d| d.face == Some(bid.face))
-//             .count();
-
-//         total_count += count;
-//         println!(
-//             "{}: {} ({} × {})",
-//             gamertag.name.yellow(),
-//             hand,
-//             count,
-//             bid.face
-//         );
-//     }
-
-//     println!(
-//         "\n{}",
-//         format!("Total: {} dice showing {}", total_count, bid.face)
-//             .bright_cyan()
-//             .bold()
-//     );
-//     println!("Bid was: {} dice showing {}", bid.quantity, bid.face);
-
-//     if total_count >= bid.quantity as usize {
-//         println!("{}", "✅ Bid was correct! Challenger loses.".bright_green());
-//         // TODO: Remove die from challenger
-//     } else {
-//         println!("{}", "❌ Bid was too high! Bidder loses.".bright_red());
-//         // TODO: Remove die from previous bidder
-//     }
-
-//     println!("\n{}", "Press Enter to continue...".dimmed());
-//     Text::new("").prompt()?;
-
-//     Ok(())
-// }
-
-// fn add_players(world: &mut World, players: &mut Vec<Entity>) -> Result<()> {
-//     let player_count = Text::new("How many players (2-6)?")
-//         .with_default("3")
-//         .prompt()?
-//         .parse::<usize>()?;
-
-//     if !(2..7).contains(&player_count) {
-//         println!("{}", "Must be 2-6 players!".red());
-//         return play_game();
-//     }
-//     for i in 0..player_count {
-//         let name = Text::new(&format!("Player {} name:", i + 1))
-//             .with_default(&format!("Player{}:", i + 1))
-//             .prompt()?;
-
-//         let player = world
-//             .spawn()
-//             .with(Player)?
-//             .with(Gamertag::new(name))?
-//             .with(Hand::new())?
-//             .build();
-
-//         players.push(player);
-//     }
-
-//     println!("\n{}", "✅ All players added!".bright_green());
-
-//     Ok(())
-// }
+    false
+}
 
 fn get_player_names() -> Result<Vec<String>> {
     let player_count = Text::new("How many players (2-6)?")

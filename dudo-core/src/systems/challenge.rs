@@ -1,5 +1,6 @@
 use crate::ClientEvent;
 use crate::DudoEvent;
+use crate::resources::BidHistory;
 use crate::resources::GamePhase;
 use crate::resources::TurnOrder;
 use crate::{Gamertag, components::dice::Hand, resources::GameState};
@@ -13,6 +14,7 @@ impl ResolveChallengeSystem {
 
         let current_bid = game_state
             .current_bid
+            .as_ref()
             .ok_or_else(|| anyhow::anyhow!("No current bid"))?;
 
         let challenged = current_bid.player;
@@ -95,6 +97,11 @@ impl ResolveChallengeSystem {
 
             // emit client event to announce winner
             world.emit_now(ClientEvent::DisplayGameOver { winner_name })?;
+        } else {
+            world.resource_mut::<BidHistory>()?.clear_round();
+            world.resource_mut::<TurnOrder>()?.advance();
+            world.resource_mut::<GameState>()?.current_bid = None;
+            world.emit_now(DudoEvent::RollDice)?;
         }
 
         Ok(())
