@@ -1,10 +1,10 @@
 [package]
-name = "dudo-client"
+name = "dudo-cli"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "dudo-client"
+name = "dudo-cli"
 path = "src/main.rs"
 
 [dependencies]
@@ -12,5 +12,3 @@ anyhow = "1.0"
 colored = "3.1.1"
 dudo-core = { path = "../dudo-core" }
 inquire = "0.9.2"
-taffy = "0.9.2"
-ggez = "0.9"
