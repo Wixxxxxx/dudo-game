@@ -9,7 +9,7 @@ pub struct RollDiceSystem;
 
 impl RollDiceSystem {
     pub fn run(world: &mut World) -> Result<()> {
-        let players_to_roll = world.query::<(Player, Hand)>();
+        let players_to_roll = world.query::<(&Player, &Hand)>();
 
         for entity in players_to_roll {
             if let Ok(hand) = world.component_mut::<Hand>(entity) {
